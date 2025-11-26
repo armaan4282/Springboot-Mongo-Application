@@ -1,12 +1,19 @@
-FROM openjdk:8-alpine
+FROM eclipse-temurin:8-jdk-alpine
 
-RUN apk update && apk add /bin/sh
+# Install bash only if needed; ash is already available
+RUN apk update && apk add --no-cache bash
 
-RUN mkdir -p /opt/app
-ENV PROJECT_HOME /opt/app
+# Create app directory
+ENV PROJECT_HOME=/opt/app
+RUN mkdir -p ${PROJECT_HOME}
 
-COPY target/spring-boot-mongo-1.0.jar $PROJECT_HOME/spring-boot-mongo.jar
+# Copy jar file
+COPY target/spring-boot-mongo-1.0.jar ${PROJECT_HOME}/spring-boot-mongo.jar
 
-WORKDIR $PROJECT_HOME
+# Set working directory
+WORKDIR ${PROJECT_HOME}
+
 EXPOSE 8080
-CMD ["java" ,"-jar","./spring-boot-mongo.jar"]
+
+# Run the application
+CMD ["java", "-jar", "spring-boot-mongo.jar"]
