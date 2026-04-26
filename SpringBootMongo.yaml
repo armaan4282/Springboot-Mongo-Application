@@ -47,7 +47,7 @@ spec:
     application: springbootmongo
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 8081
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
