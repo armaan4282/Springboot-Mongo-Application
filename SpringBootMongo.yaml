@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,14 +12,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      application: springbootmongo
-  strategy:
-    type: RollingUpdate
+      app: springbootmongo
   template:
     metadata:
-      name: spring-pod
       labels:
-        application: springbootmongo
+        app: springbootmongo
     spec:
       containers:
       - name: spring-container
@@ -23,14 +25,14 @@ spec:
         - containerPort: 8080
         resources:
           requests:
-            cpu: 300Mi
-            memory: 500Mi
+            cpu: "300m"
+            memory: "500Mi"
           limits:
-            cpu: 500Mi
-            memory: 1000Mi
+            cpu: "500m"
+            memory: "1Gi"
         env:
         - name: MONGO_DB_HOSTNAME
-          value: mongo-service #MongoDB Service Name
+          value: mongo-service
         - name: MONGO_DB_USERNAME
           value: production
         - name: MONGO_DB_PASSWORD
@@ -44,26 +46,25 @@ metadata:
 spec:
   type: NodePort
   selector:
-    application: springbootmongo
+    app: springbootmongo
   ports:
   - port: 80
-    targetPort: 8081
+    targetPort: 8080
 ---
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-   name: mongo-replicaset
-   namespace: production
+  name: mongo-deployment
+  namespace: production
 spec:
   replicas: 1
   selector:
     matchLabels:
-      application: mongo
+      app: mongo
   template:
     metadata:
-      name: mongo-pod
       labels:
-        application: mongo
+        app: mongo
     spec:
       containers:
       - name: mongo-container
@@ -79,12 +80,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-service #Service Name Should be Given for MONGO_DB_HOSTNAME
+  name: mongo-service
   namespace: production
 spec:
   type: ClusterIP
   selector:
-    application: mongo
+    app: mongo
   ports:
   - port: 27017
     targetPort: 27017
